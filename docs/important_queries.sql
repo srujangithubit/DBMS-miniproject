@@ -25,6 +25,7 @@ WITH player_totals AS (
          SUM(games_played) AS player_match_appearances
   FROM player_game_stats
   GROUP BY game_id, season_id
+  HAVING COUNT(*) >= 1
 ), match_totals AS (
   SELECT game_id, season_id,
          COUNT(*) FILTER (WHERE status = 'COMPLETED') AS completed_matches

@@ -23,8 +23,8 @@ Run the cases on the project machine. The **Actual Result** column is intentiona
 | TC-17 | NoSQL | Sign in, join queue or finalize result, then inspect `audit_events` | An action event appears with actor, action, entity, timestamp | Not run |
 | TC-18 | NoSQL | Inspect `match_telemetry` for a seeded fixture | Document includes flexible game-specific metrics and seed-demo marker | Not run |
 | TC-19 | Indexes/search | Search for a profile by display name or bio text | Matching player is returned; GIN full-text index is available to planner where appropriate | Not run |
-| TC-20 | Automated unit test | Run `npm run test:elo` | All Elo helper tests pass | Not run |
-| TC-21 | Build | Run `npm run typecheck` and `npm run build` | TypeScript/build completes without errors | Not run |
+| TC-20 | Automated unit test | Run `npm run test:elo` | All Elo helper tests pass | Pass — 4 tests passed |
+| TC-21 | Build | Run `npm run typecheck` and `npm run build` | TypeScript/build completes without errors | Pass — typecheck and production build completed |
 | TC-22 | Audit integrity | Attempt UPDATE or DELETE on an existing `rating_history` row in a disposable test DB | Trigger rejects the mutation; original history row remains unchanged | Not run |
 
 ## Evidence checklist

@@ -4,11 +4,11 @@
 **Department of Computer Science and Engineering**  
 **Project Name:** ArenaRank  
 **Student 1:** Srujan Javaregowda — PES2UG24CS526  
-**Student 2:** [Enter full name and SRN]  
+**Student 2:** Sushant Hiremath — PES2UG24CS542  
 **Course Instructor:** Dr. Nagasundari S.  
 **Academic Year:** 2026–2027
 
-> **Submission finalization:** Confirm the project title is unique within the section. Replace the Student 2 placeholder and add real execution screenshots and test outcomes after running the project. The seeded players, outcomes and telemetry are synthetic demonstration data.
+> **Submission finalization:** Confirm the project title is unique within the section and add the live execution screenshots required by the course. The seeded players, outcomes and telemetry are synthetic demonstration data.
 
 ---
 

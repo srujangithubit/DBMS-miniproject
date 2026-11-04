@@ -1,8 +1,8 @@
 # Team Contribution Matrix
 
-Replace the placeholders and revise the entries to reflect actual team contributions and repository history. Each person should contribute to both the database and application, consistent with the course requirement.
+The contribution matrix should reflect the work each student can explain and demonstrate at submission. Each person contributes to both the database and application, consistent with the course requirement.
 
-| Workstream | Member 1: Srujan Javaregowda (PES2UG24CS526) | Member 2: [Name and SRN] | Evidence to show |
+| Workstream | Member 1: Srujan Javaregowda (PES2UG24CS526) | Member 2: Sushant Hiremath (PES2UG24CS542) | Evidence to show |
 |---|---|---|---|
 | Problem analysis and requirements | Co-designed matchmaking and Elo behavior | Co-designed use cases and constraints | Requirements commits / meeting notes |
 | ER diagram and relational design | Draft tables, keys and constraints | Review relationships and normal forms | ERD source/commit |
