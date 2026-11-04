@@ -52,8 +52,13 @@ The following screenshots were captured from the seeded local application on 4 N
 3. [Leaderboard search view](./assets/03_leaderboard_search.png)
 4. [Joined matchmaking queue](./assets/04_queue_joined.png)
 5. [Completed match history](./assets/05_match_created.png)
+6. [Admin pending-results console](./assets/06_admin_pending_match.png)
+7. [Completed-result ledger](./assets/07_result_finalized.png)
+8. [Rating-change ledger](./assets/08_postgres_rating_history.png)
+9. [MongoDB audit-events console](./assets/09_mongodb_audit_events.png)
+10. [Typecheck, Elo test, and build output](./assets/10_test_output.png)
 
-The remaining requested evidence images (admin pending/finalized states, direct PostgreSQL/MongoDB output, and test terminal output) must be captured from the corresponding live workflow before final hand-in; no screenshots are fabricated in this repository.
+The admin screenshot records the actual seeded state of zero pending matches, while the completed-result and rating-ledger screenshots show the existing committed fixtures. The UI captures are evidence of the live application; direct database-shell output was not substituted or fabricated.
 
 ## 2. User Roles and Requirements
 
