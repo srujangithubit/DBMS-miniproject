@@ -283,7 +283,8 @@ export default function HomePage() {
     </main>;
   }
 
-  return <main className="app-shell">
+  const gameTheme = activeGame?.slug || 'arena';
+  return <main className={`app-shell game-theme-${gameTheme}`}>
     <aside className="sidebar">
       <div className="brand-lockup sidebar-brand"><span className="brand-symbol">A<span>+</span></span><span><strong>ARENA<span>RANK</span></strong><small>COMPETITIVE INTELLIGENCE</small></span></div>
       <div className="side-label">WORKSPACE</div>
@@ -312,7 +313,7 @@ export default function HomePage() {
           {view === 'overview' && <>
             <div className="hero-panel">
               <div className="hero-text"><div className="hero-kicker"><span className="hero-pip" /> YOUR COMPETITIVE SNAPSHOT</div><h2>{user.role === 'ADMIN' ? 'Keep the competition fair.' : <>Make every round<br /><em>count.</em></>}</h2><p>{user.role === 'ADMIN' ? 'Review pending results, monitor platform activity, and keep Elo ratings consistent.' : 'Queue into a balanced match, improve your rating, and make your name on the board.'}</p><button className="hero-button" onClick={() => setView(user.role === 'ADMIN' ? 'admin' : 'matchmaking')}>{user.role === 'ADMIN' ? 'Review admin console' : 'Find a match'} <span>↗</span></button></div>
-              <div className="hero-art" aria-hidden="true"><div className="art-ring ring-one"/><div className="art-ring ring-two"/><div className="art-ring ring-three"/><div className="art-cross cross-one"/><div className="art-cross cross-two"/><div className="art-core"><span>AR</span><small>RANKED</small></div><div className="art-label art-label-top">ELO SYSTEM <b>●</b></div><div className="art-label art-label-bottom">SKILL MATCHING <b>↗</b></div></div>
+              <div className="hero-art" aria-label={`${activeGame?.name || 'ArenaRank'} visual theme`}><div className="art-ring ring-one"/><div className="art-ring ring-two"/><div className="art-ring ring-three"/><div className="art-cross cross-one"/><div className="art-cross cross-two"/><div className="art-core"><span>{activeGame?.slug === 'rocket-league' ? 'RL' : activeGame?.slug === 'counter-strike-2' ? 'CS' : 'AR'}</span><small>{activeGame?.name || 'RANKED'}</small></div><div className="art-label art-label-top">LIVE TITLE <b>●</b></div><div className="art-label art-label-bottom">{activeGame?.name || 'SKILL MATCHING'} <b>↗</b></div></div>
               <div className="hero-watermark">ARENA</div>
             </div>
             <div className="stats-grid">
