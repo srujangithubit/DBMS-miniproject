@@ -72,7 +72,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState<ViewName>('overview');
-  const [gameId, setGameId] = useState(1);
+  const [gameId, setGameId] = useState(0);
   const [notice, setNotice] = useState<{ kind: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('player1@esports.local');
@@ -81,6 +81,9 @@ export default function HomePage() {
   const [displayName, setDisplayName] = useState('');
   const [search, setSearch] = useState('');
   const [playerResults, setPlayerResults] = useState<PlayerRow[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  const [refreshing, setRefreshing] = useState(false);
 
   const api = useCallback(async (path: string, init?: RequestInit) => {
     const response = await fetch(path, { ...init, headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) }, cache: 'no-store' });
@@ -89,17 +92,20 @@ export default function HomePage() {
     return payload;
   }, []);
 
-  const loadDashboard = useCallback(async () => {
+  const loadDashboard = useCallback(async (silent = false) => {
     if (!user) return;
-    setLoading(true);
+    if (silent) setRefreshing(true);
+    else setLoading(true);
     try {
       const result = await api(`/api/dashboard?gameId=${gameId}`);
       setDashboard(result as Dashboard);
       if (result.games?.length && !result.games.some((game: Game) => Number(game.id) === gameId)) setGameId(Number(result.games[0].id));
+      setLastUpdated(new Date());
     } catch (error) {
-      setNotice({ kind: 'error', text: error instanceof Error ? error.message : 'Could not load dashboard.' });
+      if (!silent) setNotice({ kind: 'error', text: error instanceof Error ? error.message : 'Could not load dashboard.' });
     } finally {
-      setLoading(false);
+      if (silent) setRefreshing(false);
+      else setLoading(false);
     }
   }, [api, gameId, user]);
 
@@ -125,6 +131,17 @@ export default function HomePage() {
   useEffect(() => {
     if (user) void loadDashboard();
   }, [user, loadDashboard]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const timer = window.setInterval(() => void loadDashboard(true), 30_000);
+    return () => window.clearInterval(timer);
+  }, [loadDashboard, user]);
 
   useEffect(() => {
     if (!user || view !== 'leaderboard') return;
@@ -207,6 +224,7 @@ export default function HomePage() {
   const activeGame = useMemo(() => dashboard?.games.find((game) => Number(game.id) === gameId) || dashboard?.games[0], [dashboard?.games, gameId]);
   const leaderboardRows = useMemo(() => search ? playerResults : (dashboard?.leaderboard || []), [dashboard?.leaderboard, playerResults, search]);
   const completedMatches = (dashboard?.matches || []).filter((match) => match.status === 'COMPLETED');
+  const queueAge = dashboard?.queue ? formatDuration(Math.max(0, now - new Date(dashboard.queue.joined_at).getTime())) : null;
 
   if (!user) {
     return <main className="auth-shell">
@@ -249,14 +267,14 @@ export default function HomePage() {
     <section className="main-workspace">
       <header className="topbar">
         <div className="breadcrumbs"><span>ARENA /</span> {view.replace('-', ' ').toUpperCase()}</div>
-        <div className="topbar-right"><span className="system-status"><i /> DATABASES ONLINE</span><div className="topbar-divider" /><button className="topbar-user" onClick={() => setView(user.role === 'ADMIN' ? 'admin' : 'overview')}><span className="mini-avatar">{initials(user.displayName)}</span><span>{user.displayName}</span><span className="chevron">⌄</span></button></div>
+        <div className="topbar-right"><span className="system-status"><i /> DATABASES ONLINE</span><span className="sync-status">{refreshing ? 'SYNCING…' : lastUpdated ? `SYNCED ${relativeTime(lastUpdated, now)}` : 'WAITING FOR DATA'}</span><div className="topbar-divider" /><button className="topbar-user" onClick={() => setView(user.role === 'ADMIN' ? 'admin' : 'overview')}><span className="mini-avatar">{initials(user.displayName)}</span><span>{user.displayName}</span><span className="chevron">⌄</span></button></div>
       </header>
 
       <div className="page-content">
         {notice && <div className={`notice global-notice ${notice.kind}`}><span>{notice.kind === 'error' ? '!' : notice.kind === 'success' ? '✓' : 'i'}</span>{notice.text}<button aria-label="Dismiss message" onClick={() => setNotice(null)}>×</button></div>}
         <div className="page-heading-row">
           <div><div className="eyebrow">{dashboard?.activeSeason?.name || 'SEASON NOT CONFIGURED'} <span className="eyebrow-line" /></div><h1>{view === 'overview' ? <>Competitive <em>overview.</em></> : view === 'leaderboard' ? <>Rankings that <em>matter.</em></> : view === 'matchmaking' ? <>Find your <em>rival.</em></> : view === 'matches' ? <>Every match tells <em>a story.</em></> : <>Platform <em>control.</em></>}</h1><p className="heading-subtitle">{view === 'overview' ? 'Your performance, current standing, and the next opportunity to climb.' : view === 'leaderboard' ? 'Explore player performance by game, season, rating, and win rate.' : view === 'matchmaking' ? 'Match with a player near your current Elo rating.' : view === 'matches' ? 'Review completed results and official matches waiting for verification.' : 'Monitor pending match results and review the recent activity audit trail.'}</p></div>
-          <div className="heading-actions"><label className="game-select-label">COMPETITIVE TITLE<select value={gameId} onChange={(e) => setGameId(Number(e.target.value))} aria-label="Select competitive game">{(dashboard?.games || []).map((game) => <option key={game.id} value={game.id}>{game.name}</option>)}</select></label><button className="icon-button refresh-button" title="Refresh data" onClick={() => void loadDashboard()} disabled={loading}>↻</button></div>
+          <div className="heading-actions"><label className="game-select-label">COMPETITIVE TITLE<select value={activeGame?.id || ''} onChange={(e) => setGameId(Number(e.target.value))} aria-label="Select competitive game">{(dashboard?.games || []).map((game) => <option key={game.id} value={game.id}>{game.name}</option>)}</select></label><button className={`icon-button refresh-button ${refreshing ? 'is-refreshing' : ''}`} title="Refresh data" onClick={() => void loadDashboard(true)} disabled={loading || refreshing}>↻</button></div>
         </div>
 
         {loading && !dashboard ? <div className="loading-panel"><span className="loader" /><span>Loading competitive data…</span></div> : <>
@@ -270,7 +288,7 @@ export default function HomePage() {
               <div className="stat-card stat-primary"><div className="stat-top"><span>YOUR ELO RATING</span><span className="stat-icon">↗</span></div><div className="stat-value">{dashboard?.stats ? number(dashboard.stats.rating).toLocaleString() : '—'}<small> ELO</small></div><div className="stat-foot"><span className="rating-chip">{dashboard?.stats ? `Peak ${number(dashboard.stats.peak_rating).toLocaleString()}` : 'Play to establish rating'}</span><span>Current season</span></div><div className="stat-mini-bars"><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></div>
               <div className="stat-card"><div className="stat-top"><span>MATCHES PLAYED</span><span className="stat-icon neutral">◷</span></div><div className="stat-value">{dashboard?.stats ? number(dashboard.stats.games_played).toLocaleString() : '0'}</div><div className="stat-foot"><span>Official results</span><span className="stat-soft">↗ Live ledger</span></div><div className="stat-bottom-line"><span style={{ width: `${Math.min(100, number(dashboard?.stats?.games_played) * 5)}%` }} /></div></div>
               <div className="stat-card"><div className="stat-top"><span>WIN RATE</span><span className="stat-icon neutral">⌁</span></div><div className="stat-value">{dashboard?.stats?.win_rate_pct != null ? `${number(dashboard.stats.win_rate_pct).toFixed(1)}%` : '—'}</div><div className="stat-foot"><span>{dashboard?.stats ? `${number(dashboard.stats.wins)} wins · ${number(dashboard.stats.losses)} losses` : 'No completed matches yet'}</span><span className="stat-soft">Current title</span></div><div className="stat-bottom-line"><span style={{ width: `${Math.max(0, Math.min(100, number(dashboard?.stats?.win_rate_pct)))}%` }} /></div></div>
-              <div className="stat-card"><div className="stat-top"><span>QUEUE STATUS</span><span className="stat-icon neutral">⌘</span></div><div className="stat-value stat-value-word">{dashboard?.queue ? 'IN QUEUE' : 'READY'}</div><div className="stat-foot"><span>{dashboard?.queue ? `${dashboard.queue.game_name} · ${dashboard.queue.rating_snapshot} Elo` : `${number(dashboard?.queueCount)} waiting for ${activeGame?.name || 'a game'}`}</span><span className="stat-soft">{dashboard?.queue ? 'Searching' : 'Matchmaking'}</span></div><div className="stat-bottom-line"><span style={{ width: dashboard?.queue ? '72%' : '22%' }} /></div></div>
+              <div className="stat-card"><div className="stat-top"><span>QUEUE STATUS</span><span className="stat-icon neutral">⌘</span></div><div className="stat-value stat-value-word">{dashboard?.queue ? 'IN QUEUE' : 'READY'}</div><div className="stat-foot"><span>{dashboard?.queue ? `${dashboard.queue.game_name} · ${dashboard.queue.rating_snapshot} Elo` : `${number(dashboard?.queueCount)} waiting for ${activeGame?.name || 'a game'}`}</span><span className="stat-soft">{dashboard?.queue ? `${queueAge} elapsed` : 'Matchmaking'}</span></div><div className="stat-bottom-line"><span style={{ width: dashboard?.queue ? '72%' : '22%' }} /></div></div>
             </div>
             <div className="content-grid overview-grid">
               <section className="panel leaderboard-panel"><div className="panel-heading"><div><span className="panel-overline">PERFORMANCE INDEX</span><h3>Top contenders</h3></div><button className="text-link" onClick={() => setView('leaderboard')}>Full leaderboard <span>↗</span></button></div><LeaderboardTable rows={(dashboard?.leaderboard || []).slice(0, 5)} highlightUserId={user.id} /></section>
@@ -294,6 +312,19 @@ export default function HomePage() {
 }
 
 const MAX_RATING_GAP_LABEL = '300';
+
+function formatDuration(milliseconds: number): string {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  return `${minutes}:${String(totalSeconds % 60).padStart(2, '0')}`;
+}
+
+function relativeTime(value: Date, now: number): string {
+  const seconds = Math.max(0, Math.floor((now - value.getTime()) / 1000));
+  if (seconds < 5) return 'JUST NOW';
+  if (seconds < 60) return `${seconds}S AGO`;
+  return `${Math.floor(seconds / 60)}M AGO`;
+}
 
 function LeaderboardTable({ rows, highlightUserId }: { rows: PlayerRow[]; highlightUserId: string }) {
   if (!rows.length) return <div className="empty-state"><span>⌕</span><strong>No players found</strong><p>Try another name or make sure a season is active.</p></div>;
