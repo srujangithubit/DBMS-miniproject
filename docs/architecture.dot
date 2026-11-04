@@ -1,0 +1,18 @@
+digraph Architecture {
+ graph [rankdir=TB, bgcolor="#0d1119", pad="0.3", nodesep="0.35", ranksep="0.55", splines=ortho, fontname="Arial", label="ARENARANK — APPLICATION AND DATA ARCHITECTURE", labelloc=t, fontsize=20, fontcolor="#e9eef7"];
+ node [shape=box, style="rounded,filled", fontname="Arial", fontsize=11, color="#39455b", fontcolor="#e9eef7", margin="0.18,0.13"];
+ edge [color="#8c9ab0", fontname="Arial", fontsize=9, fontcolor="#b8c4d8", arrowsize=0.7];
+ browser [label="Browser / Next.js UI\nLogin · Dashboard · Leaderboard\nQueue · Match history · Admin", fillcolor="#1c2736"];
+ routes [label="Next.js Route Handlers\nInput validation · Session JWT\nRole authorization · API responses", fillcolor="#263344"];
+ auth [label="Authentication helpers\nbcrypt password hashing\nHTTP-only signed session cookie", fillcolor="#302d4f"];
+ pg [label="PostgreSQL 16 — SYSTEM OF RECORD\nUsers · Profiles · Games · Seasons\nQueues · Matches · Elo stats · Rating history\nViews · Constraints · Indexes · Triggers · Function", fillcolor="#253a31"];
+ mongo [label="MongoDB 7 — DOCUMENT DATA\naudit_events · match_telemetry\nFlexible event and game-specific metrics", fillcolor="#302d4f"];
+ compose [label="Docker Compose local services\nHealth checks · Persistent volumes", fillcolor="#202636"];
+ browser -> routes [label="HTTPS / JSON API"];
+ routes -> auth [label="verify / sign session"];
+ routes -> pg [label="SQL queries + transactions"];
+ routes -> mongo [label="best-effort event writes / reads"];
+ compose -> pg [style=dashed, label="service"];
+ compose -> mongo [style=dashed, label="service"];
+ {rank=same; pg; mongo;}
+}

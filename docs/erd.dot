@@ -1,0 +1,28 @@
+digraph ERD {
+  graph [rankdir=LR, bgcolor="#0d1119", pad="0.35", nodesep="0.42", ranksep="0.7", splines=ortho, fontname="Arial", label="ARENARANK — RELATIONAL ER DIAGRAM", labelloc=t, fontsize=20, fontcolor="#e9eef7"];
+  node [shape=plain, fontname="Arial"];
+  edge [fontname="Arial", fontsize=9, color="#8c9ab0", fontcolor="#bbc7d9", arrowsize=0.7];
+
+  users [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#c8ff53" COLSPAN="2"><B><FONT COLOR="#10150b">APP_USERS</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#c8ff53">PK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">id UUID</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">username, email (UQ)</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">password_hash, role</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">is_active, timestamps</FONT></TD></TR></TABLE> >];
+  profile [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#b3a5ff" COLSPAN="2"><B><FONT COLOR="#101226">PLAYER_PROFILES</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#b3a5ff">PK/FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">user_id UUID</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">display_name, region</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">bio, timestamps</FONT></TD></TR></TABLE> >];
+  stats [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#b3a5ff" COLSPAN="2"><B><FONT COLOR="#101226">PLAYER_GAME_STATS</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#b3a5ff">PK/FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">player_id</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#b3a5ff">PK/FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">game_id, season_id</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">rating, peak_rating</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">games_played, wins, losses</FONT></TD></TR></TABLE> >];
+  games [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#c8ff53" COLSPAN="2"><B><FONT COLOR="#10150b">GAMES</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#c8ff53">PK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">id SMALLINT</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">slug, name (UQ)</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">genre, is_active</FONT></TD></TR></TABLE> >];
+  seasons [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#c8ff53" COLSPAN="2"><B><FONT COLOR="#10150b">SEASONS</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#c8ff53">PK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">id UUID</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">name, starts_on, ends_on</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">is_active (one true)</FONT></TD></TR></TABLE> >];
+  queue [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#ffca83" COLSPAN="2"><B><FONT COLOR="#1e1408">MATCHMAKING_QUEUE</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#ffca83">PK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">id UUID</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#ffca83">FK/UQ</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">player_id</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#ffca83">FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">game_id, season_id</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">rating_snapshot, joined_at</FONT></TD></TR></TABLE> >];
+  matches [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#ffca83" COLSPAN="2"><B><FONT COLOR="#1e1408">MATCHES</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#ffca83">PK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">id UUID</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#ffca83">FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">game_id, season_id</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#ffca83">FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">player_a_id, player_b_id</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#ffca83">FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">winner_id (nullable)</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">status, rating snapshots, timestamps</FONT></TD></TR></TABLE> >];
+  history [label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6" COLOR="#3a465b"><TR><TD BGCOLOR="#b3a5ff" COLSPAN="2"><B><FONT COLOR="#101226">RATING_HISTORY</FONT></B></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#b3a5ff">PK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">id BIGSERIAL</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#b3a5ff">FK/UQ</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">player_id, match_id</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT COLOR="#b3a5ff">FK</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">game_id, season_id</FONT></TD></TR><TR><TD></TD><TD ALIGN="LEFT"><FONT COLOR="#e9eef7">old_rating, new_rating, delta</FONT></TD></TR></TABLE> >];
+
+  users -> profile;
+  profile -> stats;
+  games -> stats;
+  seasons -> stats;
+  profile -> queue;
+  games -> queue;
+  seasons -> queue;
+  profile -> matches;
+  games -> matches;
+  seasons -> matches;
+  matches -> history;
+  profile -> history;
+  {rank=same; games; seasons;}
+}
