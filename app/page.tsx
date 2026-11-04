@@ -221,6 +221,12 @@ export default function HomePage() {
     } finally { setBusy(false); }
   }
 
+  function openAuth(mode: 'login' | 'register') {
+    setAuthMode(mode);
+    setNotice(null);
+    window.setTimeout(() => document.getElementById('landing-auth')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
+  }
+
   const activeGame = useMemo(() => dashboard?.games.find((game) => Number(game.id) === gameId) || dashboard?.games[0], [dashboard?.games, gameId]);
   const leaderboardRows = useMemo(() => search ? playerResults : (dashboard?.leaderboard || []), [dashboard?.leaderboard, playerResults, search]);
   const completedMatches = (dashboard?.matches || []).filter((match) => match.status === 'COMPLETED');
@@ -232,12 +238,12 @@ export default function HomePage() {
       <header className="landing-nav">
         <div className="brand-lockup"><span className="brand-symbol">A<span>+</span></span><span><strong>ARENA<span>RANK</span></strong><small>COMPETITIVE INTELLIGENCE</small></span></div>
         <nav className="landing-links" aria-label="Public navigation">
-          <button type="button" onClick={() => setAuthMode('register')}>TOURNAMENTS</button>
-          <button type="button" onClick={() => setAuthMode('register')}>GALLERY</button>
-          <button type="button" onClick={() => setAuthMode('login')}>ABOUT US</button>
-          <button type="button" onClick={() => setAuthMode('login')}>CONTACT US</button>
+          <button type="button" onClick={() => openAuth('register')}>TOURNAMENTS</button>
+          <button type="button" onClick={() => openAuth('register')}>GALLERY</button>
+          <button type="button" onClick={() => openAuth('login')}>ABOUT US</button>
+          <button type="button" onClick={() => openAuth('login')}>CONTACT US</button>
         </nav>
-        <button className="landing-join" type="button" onClick={() => setAuthMode('register')}>JOIN NOW <span>↗</span></button>
+        <button className="landing-join" type="button" onClick={() => openAuth('register')}>JOIN NOW <span>↗</span></button>
       </header>
       <section className="landing-hero">
         <div className="landing-copy">
@@ -245,8 +251,8 @@ export default function HomePage() {
           <h1>PLAY HARD.<br /><em>RANK HIGH.</em></h1>
           <p>Skill-based matchmaking, transparent Elo ratings, and a competitive arena built for players who want every match to matter.</p>
           <div className="landing-actions">
-            <button className="landing-primary" type="button" onClick={() => setAuthMode('register')}>REGISTER NOW <span>↗</span></button>
-            <button className="landing-secondary" type="button" onClick={() => setAuthMode('login')}>SIGN IN</button>
+            <button className="landing-primary" type="button" onClick={() => openAuth('register')}>REGISTER NOW <span>↗</span></button>
+            <button className="landing-secondary" type="button" onClick={() => openAuth('login')}>SIGN IN</button>
           </div>
           <div className="landing-stats"><div><strong>03</strong><small>LIVE TITLES</small></div><div><strong>±300</strong><small>ELO WINDOW</small></div><div><strong>24/7</strong><small>QUEUE READY</small></div></div>
         </div>
@@ -257,7 +263,7 @@ export default function HomePage() {
         </div>
       </section>
       <div className="landing-partners"><span>POWERED BY COMPETITION</span><strong>VALORANT</strong><strong>CS2</strong><strong>ROCKET LEAGUE</strong><strong>ARENA / 01</strong></div>
-      <section className="auth-card landing-auth-card">
+      <section className="auth-card landing-auth-card" id="landing-auth">
         <div className="auth-card-heading"><span className="auth-eyebrow"><span className="pulse-dot" /> {authMode === 'login' ? 'PLAYER LOGIN' : 'NEW PLAYER REGISTRATION'}</span><h2>{authMode === 'login' ? 'Enter the arena.' : 'Build your profile.'}</h2><p className="auth-copy">Your next win starts with a single sign in.</p></div>
         <form onSubmit={handleAuth} className="auth-form">
           {authMode === 'register' && <>
