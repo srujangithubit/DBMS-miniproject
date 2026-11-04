@@ -227,13 +227,38 @@ export default function HomePage() {
   const queueAge = dashboard?.queue ? formatDuration(Math.max(0, now - new Date(dashboard.queue.joined_at).getTime())) : null;
 
   if (!user) {
-    return <main className="auth-shell">
+    return <main className="auth-shell landing-shell">
       <div className="auth-backdrop-grid" />
-      <section className="auth-card">
+      <header className="landing-nav">
         <div className="brand-lockup"><span className="brand-symbol">A<span>+</span></span><span><strong>ARENA<span>RANK</span></strong><small>COMPETITIVE INTELLIGENCE</small></span></div>
-        <div className="auth-eyebrow"><span className="pulse-dot" /> SEASON ACTIVE</div>
-        <h1>{authMode === 'login' ? <>Your next win<br /><em>starts here.</em></> : <>Build your<br /><em>competitive profile.</em></>}</h1>
-        <p className="auth-copy">Skill-based matchmaking. Transparent Elo ratings. One leaderboard for every season.</p>
+        <nav className="landing-links" aria-label="Public navigation">
+          <button type="button" onClick={() => setAuthMode('register')}>TOURNAMENTS</button>
+          <button type="button" onClick={() => setAuthMode('register')}>GALLERY</button>
+          <button type="button" onClick={() => setAuthMode('login')}>ABOUT US</button>
+          <button type="button" onClick={() => setAuthMode('login')}>CONTACT US</button>
+        </nav>
+        <button className="landing-join" type="button" onClick={() => setAuthMode('register')}>JOIN NOW <span>↗</span></button>
+      </header>
+      <section className="landing-hero">
+        <div className="landing-copy">
+          <span className="landing-kicker"><i /> SEASON 01 / LIVE COMPETITION</span>
+          <h1>PLAY HARD.<br /><em>RANK HIGH.</em></h1>
+          <p>Skill-based matchmaking, transparent Elo ratings, and a competitive arena built for players who want every match to matter.</p>
+          <div className="landing-actions">
+            <button className="landing-primary" type="button" onClick={() => setAuthMode('register')}>REGISTER NOW <span>↗</span></button>
+            <button className="landing-secondary" type="button" onClick={() => setAuthMode('login')}>SIGN IN</button>
+          </div>
+          <div className="landing-stats"><div><strong>03</strong><small>LIVE TITLES</small></div><div><strong>±300</strong><small>ELO WINDOW</small></div><div><strong>24/7</strong><small>QUEUE READY</small></div></div>
+        </div>
+        <div className="landing-art" aria-label="Abstract esports arena artwork">
+          <div className="art-glow" /><div className="art-grid" /><div className="art-frame frame-one" /><div className="art-frame frame-two" />
+          <div className="art-player"><span className="player-visor" /><span className="player-armor" /><span className="player-arm arm-left" /><span className="player-arm arm-right" /></div>
+          <div className="art-badge">AR<br /><small>RANKED</small></div><span className="art-coordinate">45° 12' / MATCH POINT</span>
+        </div>
+      </section>
+      <div className="landing-partners"><span>POWERED BY COMPETITION</span><strong>VALORANT</strong><strong>CS2</strong><strong>ROCKET LEAGUE</strong><strong>ARENA / 01</strong></div>
+      <section className="auth-card landing-auth-card">
+        <div className="auth-card-heading"><span className="auth-eyebrow"><span className="pulse-dot" /> {authMode === 'login' ? 'PLAYER LOGIN' : 'NEW PLAYER REGISTRATION'}</span><h2>{authMode === 'login' ? 'Enter the arena.' : 'Build your profile.'}</h2><p className="auth-copy">Your next win starts with a single sign in.</p></div>
         <form onSubmit={handleAuth} className="auth-form">
           {authMode === 'register' && <>
             <label>Player handle<input required minLength={3} maxLength={24} pattern="[A-Za-z0-9_]+" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="e.g. NovaStrike" autoComplete="username" /></label>
@@ -248,7 +273,7 @@ export default function HomePage() {
         {authMode === 'login' && <div className="demo-accounts"><span>DEMO ACCESS</span><div><button type="button" onClick={() => { setEmail('player1@esports.local'); setPassword('Player123!'); }}>Player demo</button><button type="button" onClick={() => { setEmail('admin@esports.local'); setPassword('Admin123!'); }}>Admin demo</button></div></div>}
         <p className="auth-footnote">Academic demonstration environment · Do not reuse the demo credentials in production.</p>
       </section>
-      <aside className="auth-sidecopy"><span className="side-number">01 / COMPETE</span><p>Every match<br />has a <em>meaning.</em></p><div className="side-rule" /><span className="side-note">MATCHMAKING · ELO · SEASONAL RANKINGS</span></aside>
+      <footer className="landing-footer"><span>ARENA / COMPETITIVE INTELLIGENCE</span><span>FOLLOW THE CLIMB <b>↗</b></span></footer>
     </main>;
   }
 
