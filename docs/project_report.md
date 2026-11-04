@@ -43,6 +43,18 @@ The proposed platform matches two eligible players in the same game and active s
 
 The prototype supports one active season at a time, multiple games, two-player head-to-head matches, a simple Elo variant, a rating-gap queue, an admin-controlled result workflow, a player directory and a compact activity feed. It does not connect to real game servers, automatically verify game results, manage tournaments or teams, support draws, or process real game telemetry streams. Synthetic seed records are used to make the interface demonstrable before players generate their own data.
 
+## Submission evidence
+
+The following screenshots were captured from the seeded local application on 4 November 2026:
+
+1. [Login screen](./assets/01_login.png)
+2. [Player dashboard](./assets/02_player_dashboard.png)
+3. [Leaderboard search view](./assets/03_leaderboard_search.png)
+4. [Joined matchmaking queue](./assets/04_queue_joined.png)
+5. [Completed match history](./assets/05_match_created.png)
+
+The remaining requested evidence images (admin pending/finalized states, direct PostgreSQL/MongoDB output, and test terminal output) must be captured from the corresponding live workflow before final hand-in; no screenshots are fabricated in this repository.
+
 ## 2. User Roles and Requirements
 
 ### 2.1 Roles
