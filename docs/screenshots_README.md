@@ -15,3 +15,11 @@ Recommended filenames:
 10. `10_test_output.png` — actual `npm run test:elo` / `npm run typecheck` / `npm run build` output.
 
 Put the images in this folder and insert them into the report appendix. Update the test matrix with the real result for each case. Do not label a planned test as passed without actually running it.
+
+Additional screenshots for the extended DBMS evidence:
+
+11. `11_mongodb_aggregation.png` — output of `npm run demo:mongodb` showing all three live aggregations.
+12. `12_database_integration_tests.png` — PostgreSQL and MongoDB integration test output with isolated test databases configured.
+13. `13_full_test_build_output.png` — `npm test`, `npm run typecheck` and `npm run build` output from the final checkout.
+
+Capture these from an actual running project instance. Do not create placeholder screenshots or treat skipped database tests as passed.
