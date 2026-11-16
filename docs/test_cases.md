@@ -41,3 +41,59 @@ Run the cases on the project machine. The **Actual Result** column is intentiona
 ## Notes for repeatable tests
 
 Use the seeded local accounts. To exercise real pairing, sign in as `player1` in one browser profile and another player in a separate browser/incognito profile, then join the same game. Admin can finalize pending matches from the Admin console. Record the match UUID and check the corresponding rows using the queries in `docs/important_queries.sql`.
+
+## Automated suite added for the submission
+
+The repository's automated test command now covers the Elo helper, MongoDB aggregation pipeline definitions and database integration scenarios.
+
+~~~bash
+npm test
+~~~
+
+The fast suite consists of 12 Elo unit tests and 3 MongoDB pipeline-builder unit tests. The PostgreSQL and MongoDB integration tests are opt-in and are skipped unless `TEST_DATABASE_URL` and `TEST_MONGODB_URI` are configured. A skipped integration test is **not** a passed test.
+
+| ID | Automated area | Scenario | Expected result | Execution status |
+|---|---|---|---|---|
+| AT-01 to AT-12 | Elo unit tests | Equal-rating wins for either player; upset/favorite behavior; invalid winner; integer and range validation; clamping; zero-sum movement; player-order symmetry; configurable K-factor and invalid K-factor | All assertions pass | 12 tests passed in the implementation check on 16 Nov 2026 |
+| AT-13 | MongoDB pipeline unit test | Activity pipeline contains the date match, action grouping, unique-actor projection and sort/limit stages | Pipeline structure is valid | Passed in the implementation check on 16 Nov 2026 |
+| AT-14 | MongoDB pipeline unit test | Game and map telemetry pipelines group and average the expected fields | Pipeline structure is valid | Passed in the implementation check on 16 Nov 2026 |
+| AT-15 | MongoDB pipeline unit test | Invalid dates and empty game filters are rejected | Validation throws the expected errors | Passed in the implementation check on 16 Nov 2026 |
+| IT-PG-01 | PostgreSQL integration | Finalize a pending fixture match | Both ratings/counters update, match becomes completed, and exactly two history rows are inserted | Not run here; requires `TEST_DATABASE_URL` and the project schema |
+| IT-PG-02 | PostgreSQL integration | Finalize with a non-participant as winner | Function rejects the winner; transaction can roll back to savepoint; match/rating/history remain unchanged | Not run here; requires `TEST_DATABASE_URL` and the project schema |
+| IT-PG-03 | PostgreSQL integration | Finalize the same match twice | Second finalization is rejected; no second rating increment or history pair appears | Not run here; requires `TEST_DATABASE_URL` and the project schema |
+| IT-PG-04 | PostgreSQL integration | Update an existing rating-history row | Append-only trigger rejects the mutation and both history rows remain | Not run here; requires `TEST_DATABASE_URL` and the project schema |
+| IT-MG-01 | MongoDB integration | Aggregate temporary activity documents | Correct action counts, latest timestamp and unique actor count are returned | Not run here; requires `TEST_MONGODB_URI` |
+| IT-MG-02 | MongoDB integration | Aggregate temporary telemetry documents | Correct per-game averages and selected-game map totals | Not run here; requires `TEST_MONGODB_URI` |
+
+### Isolated integration-test database setup
+
+Never point integration tests at your normal development or production database. The tests refuse PostgreSQL or MongoDB database names that do not end in `_test`, create uniquely named fixture records/collections, and roll back or drop those fixtures.
+
+For PostgreSQL, create a separate database and apply the schema. On the default Docker Compose setup, the service is reachable from the host on port `5433`:
+
+~~~bash
+docker compose exec postgres createdb -U esports esports_platform_test
+psql "postgresql://esports:change-me-locally@localhost:5433/esports_platform_test" -v ON_ERROR_STOP=1 -f db/schema.sql
+~~~
+
+Set the following values in `.env` before running the integration suite:
+
+~~~env
+TEST_DATABASE_URL=postgresql://esports:change-me-locally@localhost:5433/esports_platform_test
+TEST_MONGODB_URI=mongodb://root:change-me-locally@localhost:27017/esports_audit_test?authSource=admin
+~~~
+
+The MongoDB integration suite creates temporary uniquely named collections in `esports_audit_test` and drops them after each test. It does not clear existing collections.
+
+Run the complete suite with `npm test`, or just the database tests with `npm run test:integration`. When the two test connection variables are blank, the database tests are reported as skipped. The CI workflow provisions disposable PostgreSQL and MongoDB services and runs all six database integration cases.
+
+## Build verification
+
+Run these separately and record the actual output from the project machine:
+
+~~~bash
+npm run typecheck
+npm run build
+~~~
+
+The implementation environment used for the 15 fast unit tests did not have the repository's PostgreSQL/MongoDB services or complete installed project dependencies. Therefore, those database integration tests, the full Next.js build, and the screenshot checklist remain pending until executed in the project environment or the repository's CI workflow.
