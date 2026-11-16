@@ -19,7 +19,7 @@ test('telemetry pipelines group metrics by game and by selected map', () => {
   const byGame = buildTelemetrySummaryPipeline();
   const byMap = buildMapTelemetrySummaryPipeline('valorant');
   assert.ok(byGame.some((stage) => stage.$group?.matchCount?.$sum === 1));
-  assert.ok(byGame.some((stage) => stage.$group/.averageDurationSeconds?.$avg === '$durationSeconds'));
+  assert.ok(byGame.some((stage) => stage.$group?.averageDurationSeconds?.$avg === '$durationSeconds'));
   assert.deepEqual(byMap[0], { $match: { gameSlug: 'valorant' } });
   assert.ok(byMap.some((stage) => stage.$group?._id === '$map'));
 });

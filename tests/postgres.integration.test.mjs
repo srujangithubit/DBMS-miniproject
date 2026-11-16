@@ -11,8 +11,8 @@ before(async () => {
   if (!/_test$/i.test(databaseName)) {
     throw new Error("Refusing to run PostgreSQL integration tests unless TEST_DATABASE_URL targets a database ending in _test.");
   }
-  const { Pool } = await import('pg');
-  pool = new Pool({ connectionString: databaseUrl, max: 2, connectionTimeoutMillis: 5000 });
+  const { default: pg } = await import('pg');
+  pool = new pg.Pool({ connectionString: databaseUrl, max: 2, connectionTimeoutMillis: 5000 });
   await pool.query('SELECT 1');
   const schema = await pool.query("SELECT to_regclass('public.matches') AS matches, to_regclass('public.player_game_stats') AS stats");
   if (!schema.rows[0].matches || !schema.rows[0].stats) {
