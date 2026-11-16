@@ -276,3 +276,42 @@ Use `team_contributions.md` to record the actual division of work. It is a propo
 ## Conclusion
 
 ArenaRank addresses a substantive competitive-platform problem through transactional matchmaking and a reproducible Elo-rating workflow rather than a basic CRUD interface. It maps database concepts directly to requirements: PostgreSQL enforces official relational state; a view produces seasonal rankings; a stored function performs atomic rating updates; triggers and constraints protect data integrity; indexes support queueing, histories and search; and MongoDB stores evolving telemetry and operational activity. The package includes executable source, database setup, a seed routine, diagrams, schema/query documentation, test cases and a demonstration guide. Final hand-in quality depends on the team completing the clearly marked local execution, screenshot and team-member details, then recording actual test outcomes.
+
+## 14. Implementation and verification update — 16 November 2026
+
+### 14.1 MongoDB aggregation demonstrations
+
+Three reusable aggregation pipeline builders are implemented in `lib/mongo-analytics.mjs` and are executed against the repository's MongoDB collections by `scripts/mongodb_analytics.mjs`. Run `npm run demo:mongodb` after starting MongoDB and loading the seed data. The command prints three result sets:
+
+1. `audit_events` grouped by action for the last 30 days, including event count, latest event time and distinct actor count.
+2. `match_telemetry` grouped by game, including match count and average duration/rounds where those fields exist.
+3. Valorant telemetry grouped by map, including match count and average duration.
+
+The equivalent interactive mongosh examples are in `docs/nosql_examples.js`. Seeded match telemetry is synthetic demonstration data, not live telemetry from game servers.
+
+### 14.2 Expanded automated tests
+
+The Elo unit suite now contains 12 cases, including both winner directions for equal ratings, upset/favorite behavior, invalid winner and rating inputs, rating clamps, zero-sum movement away from clamp boundaries, player-order symmetry and K-factor validation. The Elo helper rejects non-finite, non-positive and excessively large K-factors.
+
+Three additional fast tests validate MongoDB aggregation pipeline structure and filter validation. The implementation check on 16 November 2026 executed these 15 fast tests successfully. This verifies the pure JavaScript rating helper and aggregation-pipeline builders; it does not prove that a live MongoDB server executed the pipelines.
+
+### 14.3 Database integration tests
+
+Four PostgreSQL integration cases exercise the actual `finalize_match` function and database constraints: successful atomic finalization with two history rows, rejection of a non-participant winner, rejection of duplicate finalization, and append-only rating history. Two MongoDB integration cases execute activity and telemetry aggregations against temporary collections.
+
+These tests are opt-in and require separate test databases. Set `TEST_DATABASE_URL` to a PostgreSQL database ending in `_test` and `TEST_MONGODB_URI` to a MongoDB database ending in `_test`. The suites reject non-test database names, roll back PostgreSQL fixtures and drop their temporary MongoDB collections. When the variables are not supplied the six database integration tests are skipped, not counted as passed. See `docs/test_cases.md` for setup and actual execution status.
+
+### 14.4 Reproducible test and demonstration commands
+
+- `npm test` — fast tests plus opt-in database integration tests.
+- `npm run test:elo` — Elo unit tests only.
+- `npm run test:integration` — PostgreSQL and MongoDB integration cases.
+- `npm run demo:mongodb` — run MongoDB activity and telemetry aggregation pipelines and print live results.
+- `npm run typecheck` — TypeScript validation.
+- `npm run build` — Next.js production build.
+
+The PostgreSQL host URL in `.env.example` uses port `5433`, matching the default Docker Compose host-port mapping. Integration-test URLs are intentionally blank in the example file to prevent accidental writes to a developer's normal database.
+
+### 14.5 Submission evidence still to capture
+
+The source repository contains the ER diagram, architecture diagram and application screenshots. Before final hand-in, rerun the application and capture current screenshots, including the terminal output of `npm run demo:mongodb`, the integration-test output with both test databases configured, and the final typecheck/build output. Do not mark an integration case or build as passed until its actual output has been recorded. `docs/final_submission_checklist.md` provides the final checklist.

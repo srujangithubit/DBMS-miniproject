@@ -171,3 +171,41 @@ docs/test_cases.md           Test plan and result fields
 ## 11. Team contribution record
 
 Fill in member names and SRNs before submission. Both members should make meaningful commits across database and application work; use the matrix in `docs/team_contributions.md` as the starting point, then change it to reflect actual work.
+
+## 12. MongoDB aggregation demonstration
+
+The project includes three executable MongoDB aggregation pipelines: recent audit activity grouped by action, match telemetry summarized by game, and Valorant telemetry grouped by map. The reusable pipelines live in `lib/mongo-analytics.mjs`; the runnable demonstration is:
+
+~~~bash
+npm run demo:mongodb
+~~~
+
+Start MongoDB and run `npm run seed` first so the synthetic demonstration documents are present. The equivalent mongosh examples are in `docs/nosql_examples.js`. The printed results come from the current MongoDB database; seeded telemetry is illustrative, not real game telemetry.
+
+## 13. Automated tests and integration tests
+
+~~~bash
+npm test
+npm run test:elo
+npm run test:integration
+npm run typecheck
+npm run build
+~~~
+
+The fast suite contains 12 Elo tests and 3 MongoDB aggregation-pipeline tests. Six database integration cases are included (four PostgreSQL and two MongoDB). Configure `TEST_DATABASE_URL` and `TEST_MONGODB_URI` in `.env` to run them; both database names must end in `_test`. The tests refuse non-test database names, roll back PostgreSQL fixture transactions, and drop their temporary MongoDB collections. Blank test variables mean database integration tests are skipped, not passed.
+
+For PostgreSQL integration tests, create a separate database and apply the schema (default Docker Compose host port is `5433`):
+
+~~~bash
+docker compose exec postgres createdb -U esports esports_platform_test
+psql "postgresql://esports:esports_dev_only@localhost:5433/esports_platform_test" -v ON_ERROR_STOP=1 -f db/schema.sql
+~~~
+
+Then set:
+
+~~~env
+TEST_DATABASE_URL=postgresql://esports:esports_dev_only@localhost:5433/esports_platform_test
+TEST_MONGODB_URI=mongodb://root:mongo_dev_only@localhost:27017/esports_audit_test?authSource=admin
+~~~
+
+The automated CI workflow provisions disposable PostgreSQL and MongoDB services and runs the same tests, typecheck and production build. See `docs/test_cases.md` and `docs/final_submission_checklist.md` for test statuses and the remaining evidence to capture.

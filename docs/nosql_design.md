@@ -78,3 +78,22 @@ db.match_telemetry.find({ gameSlug: "valorant" }).sort({ createdAt: -1 }).limit(
 ## Consistency boundary
 
 A relational database transaction cannot atomically commit a MongoDB insert in the same transaction here. The platform therefore defines PostgreSQL as the system of record and MongoDB as supporting activity/telemetry storage. The API performs best-effort audit writes after SQL commits. For production, use a transactional outbox table in PostgreSQL and a retrying worker to deliver audit events to MongoDB so events are not lost during a MongoDB outage.
+
+
+## Aggregation demonstrations
+
+The repository includes reusable, executable MongoDB aggregation pipelines in lib/mongo-analytics.mjs. The same pipeline builders are used by the live demo command and database integration tests.
+
+1. **Activity by action:** The $match stage restricts events to a date window, $group counts events and distinct actors, $project formats the result, and $sort ranks activity types.
+2. **Telemetry by game:** $group calculates match count and average duration/round count across flexible game-specific telemetry documents.
+3. **Telemetry by map:** $match selects one game and $group compares match count and average duration for each map.
+
+Start MongoDB and populate the seeded demonstration records, then run:
+
+~~~bash
+npm run demo:mongodb
+~~~
+
+The script reads MONGODB_URI and MONGODB_DB from .env, executes all three pipelines against the actual audit_events and match_telemetry collections, and prints JSON results. The interactive equivalent queries are in docs/nosql_examples.js. Seed-generated telemetry is synthetic demonstration data, not live game-server telemetry.
+
+Automated aggregation-pipeline unit tests validate the pipeline shapes. MongoDB integration tests execute the same pipelines against temporary collections in a separate database. Set TEST_MONGODB_URI to a database whose name ends in _test; the integration test refuses other database names and drops only the uniquely named collections it creates.
